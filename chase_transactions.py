@@ -3,7 +3,8 @@ import pandas as pd
 from typing import List, Dict
 import os
 from datetime import datetime
-from test_code.pdf_statement_reader import ChaseStatementReader
+from chase_statement_reader import ChaseStatementReader
+from pdf_statement_reader import read_statement
 
 class ChaseTransactions(AddTransactions):
     """
@@ -112,7 +113,7 @@ def load_chase_transactions(pdf_directory: str = "chase_files") -> pd.DataFrame:
     """
     all_transactions = []
     
-    # Create PDF reader
+    # Process all PDF files in the directory
     for filename in os.listdir(pdf_directory):
         if filename.lower().endswith('.pdf'):
             try:
@@ -120,8 +121,7 @@ def load_chase_transactions(pdf_directory: str = "chase_files") -> pd.DataFrame:
                 print(f"Processing {filename}...")
                 
                 # Use our Chase PDF reader
-                reader = ChaseStatementReader(pdf_path)
-                df = reader.extract_transactions()
+                df = read_statement(pdf_path, ChaseStatementReader)
                 
                 if not df.empty:
                     all_transactions.append(df)

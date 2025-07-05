@@ -1,6 +1,7 @@
 from apple_transactions import AppleTransactions
 from chase_transactions import ChaseTransactions
 from amex_transactions import AmexTransactions
+from citi_transactions import CitiTransactions
 import glob
 import os
 
@@ -27,6 +28,8 @@ def main():
         chase_processor = ChaseTransactions(db_config=DB_CONFIG, person="Hector Hernandez")
         # Initialize the Amex Card transaction processor
         amex_processor = AmexTransactions(db_config=DB_CONFIG, person="Hector Hernandez")
+        # Initialize the Citi Card transaction processor
+        citi_processor = CitiTransactions(db_config=DB_CONFIG, person="Hector Hernandez")
 
         # Get all Apple Card transaction files
         apple_files = glob.glob('apple_files/*.csv')
@@ -34,6 +37,8 @@ def main():
         chase_files = glob.glob('chase_files/*.csv')
         # Get all Amex Card transaction files
         amex_files = glob.glob('Amex_files/*.csv')
+        # Get all Citi Card transaction files
+        citi_files = glob.glob('Citi_files/*.csv')
         
         if apple_files:
             # Process all Apple Card transactions
@@ -55,6 +60,13 @@ def main():
             print("Successfully processed Amex Card transactions")
         else:
             print("No Amex Card transaction files found")
+
+        if citi_files:
+            # Process all Citi Card transactions
+            citi_processor.process_transactions(citi_files)
+            print("Successfully processed Citi Card transactions")
+        else:
+            print("No Citi Card transaction files found")
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")

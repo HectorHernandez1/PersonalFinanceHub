@@ -1,0 +1,28 @@
+# Ignore all CSV files
+*.csv
+
+# Ignore specific CSV files in directories
+apple_files/*.csv
+chase_files/*.csv
+Amex_files/*.csv
+Citi_files/*.csv
+
+# System files
+.DS_Store
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore VS Code settings
+.vscode/
+
+# Ignore environment variable files
+.env
+
+# Ignore test scripts
+/test_code/
+
+# dont add my notes
+next_steps_notes.txt

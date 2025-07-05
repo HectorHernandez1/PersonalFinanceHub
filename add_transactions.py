@@ -3,6 +3,9 @@ import pandas as pd
 from typing import List, Dict
 import psycopg2
 import os
+from chase_transactions import load_chase_transactions
+from amex_transactions import AmexTransactions
+from apple_transactions import AppleTransactions
 
 class AddTransactions(ABC):
     """
@@ -196,3 +199,74 @@ class AddTransactions(ABC):
         except Exception as e:
             print(f"Failed to fetch categories from DB: {e}")
             return []
+
+def load_all_transactions() -> pd.DataFrame:
+    """
+    Load transactions from all sources and combine them into a single DataFrame
+    
+    Returns:
+        DataFrame with all transactions
+    """
+    all_transactions = []
+    
+    # Load Chase transactions from PDFs
+    try:
+        chase_df = load_chase_transactions()
+        if not chase_df.empty:
+            all_transactions.append(chase_df)
+            print("\nChase transactions loaded successfully")
+    except Exception as e:
+        print(f"Error loading Chase transactions: {e}")
+    
+    # Load Amex transactions (assuming CSV for now)
+    try:
+        amex = AmexTransactions()
+        amex_transactions = amex.get_transactions()
+        if amex_transactions:
+            amex_df = pd.DataFrame(amex_transactions)
+            all_transactions.append(amex_df)
+            print("Amex transactions loaded successfully")
+    except Exception as e:
+        print(f"Error loading Amex transactions: {e}")
+    
+    # Load Apple transactions (assuming CSV for now)
+    try:
+        apple = AppleTransactions()
+        apple_transactions = apple.get_transactions()
+        if apple_transactions:
+            apple_df = pd.DataFrame(apple_transactions)
+            all_transactions.append(apple_df)
+            print("Apple transactions loaded successfully")
+    except Exception as e:
+        print(f"Error loading Apple transactions: {e}")
+    
+    if not all_transactions:
+        print("No transactions found from any source")
+        return pd.DataFrame()
+    
+    # Combine all transactions
+    combined_df = pd.concat(all_transactions, ignore_index=True)
+    
+    # Remove any duplicates based on date, description, and amount
+    combined_df = combined_df.drop_duplicates(subset=['date', 'description', 'amount'])
+    
+    # Sort by date
+    combined_df['date'] = pd.to_datetime(combined_df['date'])
+    combined_df = combined_df.sort_values('date')
+    combined_df['date'] = combined_df['date'].dt.strftime('%Y-%m-%d')
+    
+    print(f"\nTotal transactions loaded: {len(combined_df)}")
+    print(f"Date range: {combined_df['date'].min()} to {combined_df['date'].max()}")
+    print(f"Total amount: ${combined_df['amount'].sum():,.2f}")
+    
+    return combined_df
+
+if __name__ == "__main__":
+    # Example usage
+    try:
+        df = load_all_transactions()
+        print("\nFirst few transactions:")
+        print(df.head())
+        
+    except Exception as e:
+        print(f"Error: {e}")

@@ -1,6 +1,9 @@
 from add_transactions import AddTransactions
 import pandas as pd
 from typing import List, Dict
+import os
+from datetime import datetime
+from test_code.pdf_statement_reader import ChaseStatementReader
 
 class ChaseTransactions(AddTransactions):
     """
@@ -96,3 +99,67 @@ class ChaseTransactions(AddTransactions):
             }
             transactions.append(transaction)
         return transactions
+
+def load_chase_transactions(pdf_directory: str = "chase_files") -> pd.DataFrame:
+    """
+    Load Chase transactions from PDF statements
+    
+    Args:
+        pdf_directory: Directory containing Chase PDF statements
+        
+    Returns:
+        DataFrame with standardized transaction data
+    """
+    all_transactions = []
+    
+    # Create PDF reader
+    for filename in os.listdir(pdf_directory):
+        if filename.lower().endswith('.pdf'):
+            try:
+                pdf_path = os.path.join(pdf_directory, filename)
+                print(f"Processing {filename}...")
+                
+                # Use our Chase PDF reader
+                reader = ChaseStatementReader(pdf_path)
+                df = reader.extract_transactions()
+                
+                if not df.empty:
+                    all_transactions.append(df)
+                    print(f"Successfully extracted {len(df)} transactions from {filename}")
+                else:
+                    print(f"No transactions found in {filename}")
+                    
+            except Exception as e:
+                print(f"Error processing {filename}: {e}")
+                continue
+    
+    if not all_transactions:
+        print("No transactions found in any PDF files")
+        return pd.DataFrame()
+    
+    # Combine all transactions
+    combined_df = pd.concat(all_transactions, ignore_index=True)
+    
+    # Remove any duplicates based on date, description, and amount
+    combined_df = combined_df.drop_duplicates(subset=['date', 'description', 'amount'])
+    
+    # Sort by date
+    combined_df['date'] = pd.to_datetime(combined_df['date'])
+    combined_df = combined_df.sort_values('date')
+    combined_df['date'] = combined_df['date'].dt.strftime('%Y-%m-%d')
+    
+    print(f"\nTotal transactions loaded: {len(combined_df)}")
+    print(f"Date range: {combined_df['date'].min()} to {combined_df['date'].max()}")
+    print(f"Total amount: ${combined_df['amount'].sum():,.2f}")
+    
+    return combined_df
+
+if __name__ == "__main__":
+    # Example usage
+    try:
+        df = load_chase_transactions()
+        print("\nFirst few transactions:")
+        print(df.head())
+        
+    except Exception as e:
+        print(f"Error: {e}")

@@ -27,7 +27,7 @@ class AIHelper:
         try:
             response = self.openai.chat.completions.create(
                 #model="gpt-3.5-turbo",
-                model="gpt-4o",
+                model="gpt-4.1-nano",
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant that classifies merchants into spending categories."},
                     {"role": "user", "content": prompt}

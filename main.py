@@ -29,7 +29,7 @@ def main():
         },
         {
             "class": ChaseTransactions,
-            "files_glob": "chase_files/*.csv",
+            "files_glob": "chase_files/*.pdf",
             "name": "Chase Card"
         },
         {

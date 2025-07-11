@@ -24,25 +24,50 @@ class ChaseTransactions(AddTransactions):
 
     def read_files(self, file_paths: List[str]) -> pd.DataFrame:
         """
-        Read Chase Card transaction files and combine them into a single DataFrame.
+        Read Chase Card transaction PDF files and combine them into a single DataFrame.
         Args:
-            file_paths (List[str]): List of paths to Chase Card transaction CSV files
+            file_paths (List[str]): List of paths to Chase Card transaction PDF files
         Returns:
             pd.DataFrame: Combined DataFrame of all transactions
         """
-        dataframes = []
+        all_transactions = []
         for file_path in file_paths:
             try:
-                df = pd.read_csv(file_path)
-                df["person"] = self.person
-                dataframes.append(df)
+                print(f"Processing {os.path.basename(file_path)}...")
+                df = read_statement(file_path, ChaseStatementReader)
+                if not df.empty:
+                    all_transactions.append(df)
+                    print(f"Successfully extracted {len(df)} transactions from {os.path.basename(file_path)}")
+                else:
+                    print(f"No transactions found in {os.path.basename(file_path)}")
             except Exception as e:
-                print(f"Error reading file {file_path}: {str(e)}")
+                print(f"Error processing {os.path.basename(file_path)}: {e}")
                 if file_path in self.processed_files:
                     self.processed_files.remove(file_path)
-        if not dataframes:
+        
+        if not all_transactions:
             raise ValueError("No valid files were read")
-        self.df = pd.concat(dataframes, ignore_index=True)
+        
+        combined_df = pd.concat(all_transactions, ignore_index=True)
+        
+        # Standardize column names to match the expected format for clean_data
+        combined_df = combined_df.rename(columns={
+            'date': 'transaction_date',
+            'description': 'merchant_name',
+            'amount': 'amount'
+        })
+        
+        # Add person column
+        combined_df['person'] = self.person
+        
+        # Remove any duplicates based on date, description, and amount
+        combined_df = combined_df.drop_duplicates(subset=['transaction_date', 'merchant_name', 'amount'])
+        
+        # Sort by date
+        combined_df['transaction_date'] = pd.to_datetime(combined_df['transaction_date'])
+        combined_df = combined_df.sort_values('transaction_date')
+        
+        self.df = combined_df
         return self.df
 
     def clean_data(self) -> pd.DataFrame:

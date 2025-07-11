@@ -46,12 +46,16 @@ class AmexTransactions(AddTransactions):
     def clean_data(self) -> pd.DataFrame:
         """
         Clean and standardize the Amex Card transaction data.
-        You can update this method to implement your own cleaning logic.
+        - Renames columns to standard format
+        - Handles date formatting
+        - Standardizes amount values
+        - Maps categories to standard categories
         Returns:
             pd.DataFrame: Cleaned and standardized DataFrame
         """
         if self.df is None:
             raise ValueError("No data to clean. Call read_files first.")
+        
         # Rename columns to standard format
         self.df = self.df.rename(columns={
             'Date': 'transaction_date',
@@ -59,10 +63,33 @@ class AmexTransactions(AddTransactions):
             'Amount': 'amount',
             'Card Member,': 'person'
         })
+
+        # Convert date string to datetime
+        self.df['transaction_date'] = pd.to_datetime(self.df['transaction_date'])
+
+        # Ensure amount is numeric and handle credits/debits
+        self.df['amount'] = pd.to_numeric(self.df['amount'])
+        # Assuming Amex also exports credits as positive, negate amounts
+        self.df['amount'] = -1 * self.df['amount']
+
         # If category column is missing, use AI to guess it
         if 'category' not in self.df.columns:
-            categories = self.get_categories_from_db()
+            # Fetch categories once if not already cached
+            if not self._category_cache:
+                with self.create_connection() as conn:
+                    self._load_reference_data(conn)
+            categories = list(self._category_cache.keys())
             self.df['category'] = self.df['merchant_name'].apply(lambda m: self.ai_helper.guess_category_openai(m, categories))
+        
+        # Select and reorder columns
+        self.df = self.df[[
+            'transaction_date',
+            'amount',
+            'merchant_name',
+            'category',
+            'person'
+        ]]
+
         return self.df
 
     def prepare_data_for_db(self) -> List[Dict]:

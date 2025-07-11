@@ -168,14 +168,27 @@ class AddTransactions(ABC):
     def process_transactions(self, file_paths: List[str]) -> None:
         """Main method to orchestrate the entire process."""
         try:
+            # Store all file paths initially
             self.processed_files = file_paths
+            
+            # Read and clean data
             self.df = self.read_files(file_paths)
             self.df = self.clean_data()
+            
+            # Prepare data for database insertion
             transactions = self.prepare_data_for_db()
             
-            if self.add_to_database(transactions):
-                self.delete_processed_files()
-                print(f"Successfully processed {len(transactions)} transactions and deleted source files")
+            # Add to database and get the count of successfully added transactions
+            if transactions:
+                if self.add_to_database(transactions):
+                    # Only delete files if transactions were successfully added to the database
+                    self.delete_processed_files()
+                    print(f"Successfully processed {len(transactions)} transactions and deleted source files")
+                else:
+                    print("No transactions were added to the database.")
+            else:
+                print("No transactions to add after cleaning.")
+
         except Exception as e:
             raise Exception(f"Transaction processing failed: {str(e)}")
 

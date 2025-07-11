@@ -21,55 +21,42 @@ def main():
     This function handles the orchestration of loading, processing,
     and reviewing financial transactions from different sources.
     """
-    try:
-        # Initialize the Apple Card transaction processor
-        apple_processor = AppleTransactions(db_config=DB_CONFIG, person="Hector Hernandez")
-        # Initialize the Chase Card transaction processor
-        chase_processor = ChaseTransactions(db_config=DB_CONFIG, person="Hector Hernandez")
-        # Initialize the Amex Card transaction processor
-        amex_processor = AmexTransactions(db_config=DB_CONFIG, person="Hector Hernandez")
-        # Initialize the Citi Card transaction processor
-        citi_processor = CitiTransactions(db_config=DB_CONFIG, person="Hector Hernandez")
+    processors = [
+        {
+            "class": AppleTransactions,
+            "files_glob": "apple_files/*.csv",
+            "name": "Apple Card"
+        },
+        {
+            "class": ChaseTransactions,
+            "files_glob": "chase_files/*.csv",
+            "name": "Chase Card"
+        },
+        {
+            "class": AmexTransactions,
+            "files_glob": "Amex_files/*.csv",
+            "name": "Amex Card"
+        },
+        {
+            "class": CitiTransactions,
+            "files_glob": "Citi_files/*.csv",
+            "name": "Citi Card"
+        }
+    ]
 
-        # Get all Apple Card transaction files
-        apple_files = glob.glob('apple_files/*.csv')
-        # Get all Chase Card transaction files
-        chase_files = glob.glob('chase_files/*.csv')
-        # Get all Amex Card transaction files
-        amex_files = glob.glob('Amex_files/*.csv')
-        # Get all Citi Card transaction files
-        citi_files = glob.glob('Citi_files/*.csv')
+    for processor_info in processors:
+        try:
+            processor = processor_info["class"](db_config=DB_CONFIG, person="Hector Hernandez")
+            files = glob.glob(processor_info["files_glob"])
+            
+            if files:
+                processor.process_transactions(files)
+                print(f"Successfully processed {processor_info['name']} transactions")
+            else:
+                print(f"No {processor_info['name']} transaction files found")
         
-        if apple_files:
-            # Process all Apple Card transactions
-            apple_processor.process_transactions(apple_files)
-            print("Successfully processed Apple Card transactions")
-        else:
-            print("No Apple Card transaction files found")
-
-        if chase_files:
-            # Process all Chase Card transactions
-            chase_processor.process_transactions(chase_files)
-            print("Successfully processed Chase Card transactions")
-        else:
-            print("No Chase Card transaction files found")
-
-        if amex_files:
-            # Process all Amex Card transactions
-            amex_processor.process_transactions(amex_files)
-            print("Successfully processed Amex Card transactions")
-        else:
-            print("No Amex Card transaction files found")
-
-        if citi_files:
-            # Process all Citi Card transactions
-            citi_processor.process_transactions(citi_files)
-            print("Successfully processed Citi Card transactions")
-        else:
-            print("No Citi Card transaction files found")
-
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
+        except Exception as e:
+            print(f"An error occurred while processing {processor_info['name']} transactions: {str(e)}")
 
 if __name__ == "__main__":
     main()

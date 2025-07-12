@@ -1,6 +1,7 @@
 from add_transactions import AddTransactions
 import pandas as pd
 from typing import List, Dict
+from ai_helper import AIHelper
 
 class AppleTransactions(AddTransactions):
     """
@@ -18,6 +19,7 @@ class AppleTransactions(AddTransactions):
         """
         super().__init__(db_config, person)
         self.account_type = 'Apple Card'
+        self.ai_helper = AIHelper()
 
     def read_files(self, file_paths: List[str]) -> pd.DataFrame:
         """
@@ -87,12 +89,24 @@ class AppleTransactions(AddTransactions):
 
         # Use AI to categorize transactions with 'Other' category
         other_mask = self.df['category'] == 'Other'
-        if other_mask.any() and hasattr(self, 'ai_helper') and self.ai_helper:
+        if other_mask.any():
             other_transactions = self.df[other_mask]
             for idx, row in other_transactions.iterrows():
                 ai_category = self.ai_helper.guess_category_openai(
                     row['merchant_name'], 
-                    list(self.categories_cache.keys())
+                    list(self._category_cache.keys())
+                )
+                if ai_category != 'Other':
+                    self.df.loc[idx, 'category'] = ai_category
+
+        # Use AI to categorize transactions with categories not in database
+        invalid_category_mask = ~self.df['category'].isin(self._category_cache.keys())
+        if invalid_category_mask.any():
+            invalid_transactions = self.df[invalid_category_mask]
+            for idx, row in invalid_transactions.iterrows():
+                ai_category = self.ai_helper.guess_category_openai(
+                    row['merchant_name'], 
+                    list(self._category_cache.keys())
                 )
                 if ai_category != 'Other':
                     self.df.loc[idx, 'category'] = ai_category

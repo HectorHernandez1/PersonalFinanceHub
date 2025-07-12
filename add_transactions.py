@@ -26,6 +26,9 @@ class AddTransactions(ABC):
         self._category_cache = {}
         self._person_cache = {}
         self._account_type_cache = {}
+        
+        # Load categories immediately during initialization
+        self._load_categories_only()
 
     def _load_reference_data(self, conn: psycopg2.extensions.connection) -> None:
         """
@@ -44,6 +47,25 @@ class AddTransactions(ABC):
         # Load account types
         cursor.execute("SELECT id, card_type FROM budget_app.account_type")
         self._account_type_cache = {name.lower(): id for id, name in cursor.fetchall()}
+
+    def _load_categories_only(self) -> None:
+        """
+        Load only categories from the database during initialization.
+        Categories are read-only and cannot be updated or deleted.
+        """
+        try:
+            conn = psycopg2.connect(**self.db_config)
+            cursor = conn.cursor()
+            
+            # Load categories only
+            cursor.execute("SELECT id, category_name FROM budget_app.spending_categories")
+            self._category_cache = {name.lower(): id for id, name in cursor.fetchall()}
+            
+            cursor.close()
+            conn.close()
+        except Exception as e:
+            print(f"Warning: Could not load categories during initialization: {e}")
+            self._category_cache = {}
 
     def _get_or_create_category(self, conn: psycopg2.extensions.connection, category: str) -> int:
         """Get category ID, create if not exists."""

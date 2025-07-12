@@ -78,6 +78,14 @@ class AppleTransactions(AddTransactions):
             if pd.api.types.is_string_dtype(self.df['amount']):
                 self.df['amount'] = self.df['amount'].str.replace('$', '').str.replace(',', '')
             self.df['amount'] = pd.to_numeric(self.df['amount'])
+        
+        #check if mechant_name contains "return" or "refund"
+        self.df['category'] = self.df.apply(
+            lambda row: "Refunds & Returns" if 'return' in row['merchant_name'].lower() or 'refund' in row['merchant_name'].lower() else row['category'],
+            axis=1
+        )
+
+        
 
         # Select and reorder columns
         self.df = self.df[[

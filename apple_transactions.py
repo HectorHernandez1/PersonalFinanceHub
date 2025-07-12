@@ -85,7 +85,17 @@ class AppleTransactions(AddTransactions):
             axis=1
         )
 
-        
+        # Use AI to categorize transactions with 'Other' category
+        other_mask = self.df['category'] == 'Other'
+        if other_mask.any() and hasattr(self, 'ai_helper') and self.ai_helper:
+            other_transactions = self.df[other_mask]
+            for idx, row in other_transactions.iterrows():
+                ai_category = self.ai_helper.guess_category_openai(
+                    row['merchant_name'], 
+                    list(self.categories_cache.keys())
+                )
+                if ai_category != 'Other':
+                    self.df.loc[idx, 'category'] = ai_category
 
         # Select and reorder columns
         self.df = self.df[[

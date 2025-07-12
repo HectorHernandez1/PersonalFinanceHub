@@ -66,7 +66,7 @@ class CitiTransactions(AddTransactions):
         self.df['transaction_date'] = pd.to_datetime(self.df['transaction_date'], format='%m/%d/%Y')
 
         # Ensure amount is numeric and handle credits/debits
-        self.df['amount'] = self.df['amount'].astype(str).str.replace(' , '').str.replace(',', '')
+        self.df['amount'] = self.df['amount'].astype(str).str.replace(' , ', '').str.replace(',', '')
         self.df['amount'] = pd.to_numeric(self.df['amount'])
         # Assuming Citi also exports credits as positive, negate amounts
         self.df['amount'] = -1 * self.df['amount']

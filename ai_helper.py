@@ -23,15 +23,17 @@ class AIHelper:
         prompt = (
             f"Classify the following merchant into one of these spending categories: {categories_str}.\n"
             f"Merchant: {merchant_name}\n"
-            f"Category:"
+            f"You must respond with ONLY one of the exact category names listed above. Do not add any explanation or additional text.\n"
         )
         try:
+            #print(f"DEBUG - AI Prompt: {prompt}")
             messages = [
                 SystemMessage(content="You are a helpful assistant that classifies merchants into spending categories."),
                 HumanMessage(content=prompt)
             ]
             response = self.llm.invoke(messages)
             category = response.content.strip()
+            #print(f"DEBUG - AI Response: {category}")
             if category not in categories:
                 return "Other"
             return category

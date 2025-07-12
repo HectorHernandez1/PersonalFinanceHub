@@ -67,16 +67,11 @@ class AddTransactions(ABC):
             print(f"Warning: Could not load categories during initialization: {e}")
             self._category_cache = {}
 
-    def _get_or_create_category(self, conn: psycopg2.extensions.connection, category: str) -> int:
-        """Get category ID, create if not exists."""
+    def _get_category(self, category: str) -> int:
+        """Get category ID. Categories are read-only and must exist in database."""
         category_lower = category.lower()
         if category_lower not in self._category_cache:
-            cursor = conn.cursor()
-            cursor.execute(
-                "INSERT INTO budget_app.spending_categories (category_name) VALUES (%s) RETURNING id",
-                (category,)
-            )
-            self._category_cache[category_lower] = cursor.fetchone()[0]
+            raise ValueError(f"Category '{category}' does not exist in database. Categories are read-only.")
         return self._category_cache[category_lower]
 
     def _get_or_create_person(self, conn: psycopg2.extensions.connection, person: str) -> int:
@@ -146,7 +141,7 @@ class AddTransactions(ABC):
             # Process each transaction
             for transaction in transactions:
                 # Get or create reference IDs
-                category_id = self._get_or_create_category(conn, transaction['category'])
+                category_id = self._get_category(transaction['category'])
                 person_id = self._get_or_create_person(conn, transaction['person'])
                 account_type_id = self._get_or_create_account_type(conn, transaction['account_type'])
                 

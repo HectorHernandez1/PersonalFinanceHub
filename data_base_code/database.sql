@@ -47,7 +47,6 @@ INSERT INTO budget_app.spending_categories (category_name) VALUES
     ('Dining'),
     ('Entertainment'),
     ('Transportation'),
-    ('Health & Wellness'),
     ('Utilities'),
     ('Shopping'),
     ('Education'),
@@ -57,8 +56,13 @@ INSERT INTO budget_app.spending_categories (category_name) VALUES
     ('Gifts & Donations'),
     ('Insurance'),
     ('Home Maintenance'),
+    ('Other'),
+    ('Installment'),
     ('Refunds & Returns'),
-    ('Other');
+    ('Healthcare'),
+    ('AI Models'),
+    ('Payments');
+
 
 INSERT INTO budget_app.persons (name) VALUES
     ('Hector Hernandez'),

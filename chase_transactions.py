@@ -83,7 +83,7 @@ class ChaseTransactions(AddTransactions):
         # Ensure amount is numeric and handle credits/debits
         self.df['amount'] = pd.to_numeric(self.df['amount'])
         # Make all amounts negative (Chase exports credits as positive)
-        self.df['amount'] = -1 * self.df['amount']
+        #self.df['amount'] = -1 * self.df['amount']
 
         # Add a placeholder for category if not present, or map existing ones
         if 'category' not in self.df.columns:

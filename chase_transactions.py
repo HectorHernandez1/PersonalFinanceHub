@@ -3,6 +3,7 @@ import pandas as pd
 from typing import List, Dict
 from chase_statement_reader import ChaseStatementReader
 from pdf_statement_reader import read_statement
+import os
 
 class ChaseTransactions(AddTransactions):
     """

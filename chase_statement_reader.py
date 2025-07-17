@@ -2,6 +2,7 @@ from pdf_statement_reader import PDFStatementReader
 import pandas as pd
 from datetime import datetime
 import re
+import pdfplumber
 
 class ChaseStatementReader(PDFStatementReader):
     """Chase bank statement reader"""

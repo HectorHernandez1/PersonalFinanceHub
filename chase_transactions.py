@@ -58,15 +58,12 @@ class ChaseTransactions(AddTransactions):
             'amount': 'amount'
         })
         
-        # Add person column
-        combined_df['person'] = self.person
         
         # Remove any duplicates based on date, description, and amount
         combined_df = combined_df.drop_duplicates(subset=['transaction_date', 'merchant_name', 'amount'])
         
-        # Sort by date
-        combined_df['transaction_date'] = pd.to_datetime(combined_df['transaction_date'])
-        combined_df = combined_df.sort_values('transaction_date')
+        # Reset index after concatenation and deduplication
+        combined_df.reset_index(drop=True, inplace=True)
         
         self.df = combined_df
         return self.df
@@ -85,6 +82,9 @@ class ChaseTransactions(AddTransactions):
         
         # Ensure amount is numeric and handle credits/debits
         self.df['amount'] = pd.to_numeric(self.df['amount'])
+
+        # Add person column
+        self.df['person'] = self.person
 
 
         #need to add a category column if it doesn't exist

@@ -27,16 +27,16 @@ def main():
         #     "files_glob": "apple_files/*.csv",
         #     "name": "Apple Card"
         # },
-        {
-             "class": ChaseTransactions,
-             "files_glob": "chase_files/*.pdf",
-             "name": "Chase Card"
-         },
         # {
-        #     "class": AmexTransactions,
-        #     "files_glob": "Amex_files/*.csv",
-        #     "name": "Amex Card"
-        # },
+        #      "class": ChaseTransactions,
+        #      "files_glob": "chase_files/*.pdf",
+        #      "name": "Chase Card"
+        #  },
+        {
+            "class": AmexTransactions,
+            "files_glob": "Amex_files/*.csv",
+            "name": "Amex Card"
+        },
         # {
         #     "class": CitiTransactions,
         #     "files_glob": "Citi_files/*.csv",

@@ -61,6 +61,7 @@ INSERT INTO budget_app.spending_categories (category_name) VALUES
     ('Refunds & Returns'),
     ('Healthcare'),
     ('AI Models'),
+    ('Interest Charge'),
     ('Payments');
 
 

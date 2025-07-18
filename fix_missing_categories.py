@@ -29,14 +29,39 @@ def get_categories_from_db(conn):
     category_map = {name: id for id, name in categories}
     return category_names, category_map
 
-def get_transactions_without_category(conn):
-    """Get all transactions that have null category_id."""
+def get_transactions_to_update(conn, target_category=None):
+    """
+    Get transactions that need category updates.
+    
+    Args:
+        target_category (str, optional): Specific category name to target for updates.
+                                       If None, targets transactions with null category_id.
+    """
     cursor = conn.cursor()
-    cursor.execute("""
-        SELECT t.id, t.merchant_name 
-        FROM budget_app.transactions t 
-        WHERE t.category_id IS NULL
-    """)
+    
+    if target_category:
+        # Get category ID for the target category
+        cursor.execute("SELECT id FROM budget_app.spending_categories WHERE category_name = %s", (target_category,))
+        result = cursor.fetchone()
+        if not result:
+            print(f"Error: Category '{target_category}' not found in database.")
+            return []
+        
+        target_category_id = result[0]
+        cursor.execute("""
+            SELECT t.id, t.merchant_name 
+            FROM budget_app.transactions t 
+            WHERE t.category_id = %s
+        """, (target_category_id,))
+        print(f"Finding transactions with category '{target_category}'...")
+    else:
+        cursor.execute("""
+            SELECT t.id, t.merchant_name 
+            FROM budget_app.transactions t 
+            WHERE t.category_id IS NULL
+        """)
+        print("Finding transactions with null category_id...")
+    
     return cursor.fetchall()
 
 def update_transaction_category(conn, transaction_id, category_id):
@@ -50,7 +75,15 @@ def update_transaction_category(conn, transaction_id, category_id):
 
 def main():
     """Main function to fix missing category IDs."""
-    print("Starting to fix missing category IDs...")
+    import sys
+    
+    # Check for command line argument
+    target_category = None
+    if len(sys.argv) > 1:
+        target_category = sys.argv[1]
+        print(f"Starting to update transactions with category '{target_category}'...")
+    else:
+        print("Starting to fix missing category IDs...")
     
     # Initialize AI helper
     ai_helper = AIHelper()
@@ -72,13 +105,20 @@ def main():
         category_names, category_map = get_categories_from_db(conn)
         print(f"Found {len(category_names)} categories: {', '.join(category_names)}")
         
-        # Get transactions without category
-        transactions = get_transactions_without_category(conn)
-        print(f"Found {len(transactions)} transactions without category IDs")
+        # Get transactions to update
+        transactions = get_transactions_to_update(conn, target_category)
+        print(f"Found {len(transactions)} transactions to update")
         
         if not transactions:
             print("No transactions need category updates.")
             return
+        
+        # Ask for confirmation if updating a specific category
+        if target_category:
+            response = input(f"Are you sure you want to update all {len(transactions)} transactions currently categorized as '{target_category}'? (y/N): ")
+            if response.lower() != 'y':
+                print("Operation cancelled.")
+                return
         
         # Process each transaction
         updated_count = 0

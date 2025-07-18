@@ -86,19 +86,19 @@ The system includes these spending categories:
 - AI Models, Payments, Refunds & Returns
 - Interest Charge, Installment, Other
 
-### Fix Missing Categories
+### Update Categories
 
-Use the category fixing script to update transactions with missing or incorrect categories:
+Use the category update script to update transactions with missing or incorrect categories:
 
 ```bash
 # Fix transactions with null category IDs
-python fix_missing_categories.py
+python update_categories.py
 
 # Update all transactions currently categorized as "Other"
-python fix_missing_categories.py "Other"
+python update_categories.py "Other"
 
 # Update any specific category
-python fix_missing_categories.py "Installment"
+python update_categories.py "Installment"
 ```
 
 The script will:
@@ -125,7 +125,7 @@ Money_review/
 ├── amex_transactions.py        # Amex processor
 ├── citi_transactions.py        # Citi processor
 ├── ai_helper.py               # AI categorization helper
-├── fix_missing_categories.py   # Category management script
+├── update_categories.py        # Category management script
 ├── chase_statement_reader.py   # Chase PDF reader
 ├── pdf_statement_reader.py     # Generic PDF reader
 ├── data_base_code/

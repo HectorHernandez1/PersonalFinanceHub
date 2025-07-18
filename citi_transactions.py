@@ -58,27 +58,51 @@ class CitiTransactions(AddTransactions):
         self.df = self.df.rename(columns={
             'Date': 'transaction_date',
             'Description': 'merchant_name',
-            'Amount': 'amount',
-            'Category': 'category'
+            'Debit': 'amount'
         })
+
+        #merge credit and debit into amount
+        if 'Credit' in self.df.columns:
+            self.df['amount'] = self.df['amount'].fillna(0) + self.df['Credit'].fillna(0)
+            self.df.drop(columns=['Credit'], inplace=True)
+
 
         # Convert date string to datetime
         self.df['transaction_date'] = pd.to_datetime(self.df['transaction_date'], format='%m/%d/%Y')
 
         # Ensure amount is numeric and handle credits/debits
-        self.df['amount'] = self.df['amount'].astype(str).str.replace(' , ', '').str.replace(',', '')
         self.df['amount'] = pd.to_numeric(self.df['amount'])
-        # Assuming Citi also exports credits as positive, negate amounts
-        self.df['amount'] = -1 * self.df['amount']
 
         # Add person column
         self.df['person'] = self.person
 
-        # Handle missing categories
+        #need to add a category column if it doesn't exist
         if 'category' not in self.df.columns:
-            self.df['category'] = 'Uncategorized'
-        else:
-            self.df['category'] = self.df['category'].fillna('Uncategorized')
+            self.df['category'] = 'Other'
+        
+        #check if mechant_name contains "return" or "refund"
+        self.df['category'] = self.df.apply(
+            lambda row: "Refunds & Returns" if 'return' in row['merchant_name'].lower() or 'refund' in row['merchant_name'].lower() else row['category'],
+            axis=1
+        )
+
+        #check merchant_name for payments
+        self.df['category'] = self.df.apply(
+            lambda row: "Payments" if 'payment' in row['merchant_name'].lower() else row['category'],
+            axis=1
+        )
+        
+        # Use AI to categorize transactions with 'Other' category
+        other_mask = self.df['category'] == 'Other'
+        if other_mask.any():
+            other_transactions = self.df[other_mask]
+            for idx, row in other_transactions.iterrows():
+                ai_category = self.ai_helper.guess_category_openai(
+                    row['merchant_name'], 
+                    list(self._category_cache.keys())
+                )
+                if ai_category != 'Other':
+                    self.df.loc[idx, 'category'] = ai_category
 
         # Select and reorder columns
         self.df = self.df[[

@@ -39,7 +39,7 @@ def main():
         # },
         {
             "class": CitiTransactions,
-            "files_glob": "Citi_files/*.csv",
+            "files_glob": "Citi_files/*.CSV",
             "name": "Citi Card"
         }
     ]

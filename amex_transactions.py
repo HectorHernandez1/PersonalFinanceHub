@@ -64,23 +64,43 @@ class AmexTransactions(AddTransactions):
             'Card Member,': 'person'
         })
 
+        # person column should already be set, but ensure it's consistent
+        self.df['person'] = self.person
+
         # Convert date string to datetime
         self.df['transaction_date'] = pd.to_datetime(self.df['transaction_date'])
 
         # Ensure amount is numeric and handle credits/debits
         self.df['amount'] = pd.to_numeric(self.df['amount'])
-        # Assuming Amex also exports credits as positive, negate amounts
-        self.df['amount'] = -1 * self.df['amount']
 
-        # If category column is missing, use AI to guess it
+                #need to add a category column if it doesn't exist
         if 'category' not in self.df.columns:
-            # Fetch categories once if not already cached
-            if not self._category_cache:
-                with self.create_connection() as conn:
-                    self._load_reference_data(conn)
-            categories = list(self._category_cache.keys())
-            self.df['category'] = self.df['merchant_name'].apply(lambda m: self.ai_helper.guess_category_openai(m, categories))
+            self.df['category'] = 'Other'
         
+        #check if mechant_name contains "return" or "refund"
+        self.df['category'] = self.df.apply(
+            lambda row: "Refunds & Returns" if 'return' in row['merchant_name'].lower() or 'refund' in row['merchant_name'].lower() else row['category'],
+            axis=1
+        )
+
+        #check merchant_name for payments
+        self.df['category'] = self.df.apply(
+            lambda row: "Payments" if 'payment' in row['merchant_name'].lower() else row['category'],
+            axis=1
+        )
+        
+        # Use AI to categorize transactions with 'Other' category
+        other_mask = self.df['category'] == 'Other'
+        if other_mask.any():
+            other_transactions = self.df[other_mask]
+            for idx, row in other_transactions.iterrows():
+                ai_category = self.ai_helper.guess_category_openai(
+                    row['merchant_name'], 
+                    list(self._category_cache.keys())
+                )
+                if ai_category != 'Other':
+                    self.df.loc[idx, 'category'] = ai_category
+
         # Select and reorder columns
         self.df = self.df[[
             'transaction_date',

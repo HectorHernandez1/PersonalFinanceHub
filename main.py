@@ -32,16 +32,16 @@ def main():
         #      "files_glob": "chase_files/*.pdf",
         #      "name": "Chase Card"
         #  },
-        {
-            "class": AmexTransactions,
-            "files_glob": "Amex_files/*.csv",
-            "name": "Amex Card"
-        },
         # {
-        #     "class": CitiTransactions,
-        #     "files_glob": "Citi_files/*.csv",
-        #     "name": "Citi Card"
-        # }
+        #     "class": AmexTransactions,
+        #     "files_glob": "Amex_files/*.csv",
+        #     "name": "Amex Card"
+        # },
+        {
+            "class": CitiTransactions,
+            "files_glob": "Citi_files/*.csv",
+            "name": "Citi Card"
+        }
     ]
 
     for processor_info in processors:

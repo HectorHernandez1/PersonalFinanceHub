@@ -1,6 +1,6 @@
 from add_transactions import AddTransactions
 import pandas as pd
-from typing import List, Dict
+from typing import List
 from ai_helper import AIHelper
 
 class CitiTransactions(AddTransactions):
@@ -88,26 +88,4 @@ class CitiTransactions(AddTransactions):
 
         return self.df
 
-    def prepare_data_for_db(self) -> List[Dict]:
-        """
-        Convert the cleaned DataFrame into a format suitable for database insertion.
-        
-        Returns:
-            List[Dict]: List of dictionaries containing formatted transaction data
-        """
-        if self.df is None:
-            raise ValueError("No data to prepare. Call clean_data first.")
-
-        transactions = []
-        for _, row in self.df.iterrows():
-            transaction = {
-                'transaction_date': row['transaction_date'].strftime('%Y-%m-%d %H:%M:%S'),
-                'amount': float(row['amount']),
-                'merchant_name': row['merchant_name'],
-                'category': row['category'],
-                'account_type': self.account_type,
-                'person': self.person
-            }
-            transactions.append(transaction)
-
-        return transactions 
+ 

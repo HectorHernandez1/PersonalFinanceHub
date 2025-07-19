@@ -116,10 +116,39 @@ class AddTransactions(ABC):
         except psycopg2.Error as e:
             raise Exception(f"Database connection error: {str(e)}")
 
-    @abstractmethod
     def prepare_data_for_db(self) -> List[Dict]:
-        """Convert the cleaned DataFrame into a format suitable for database insertion."""
-        pass
+        """
+        Convert the cleaned DataFrame into a format suitable for database insertion.
+        
+        Returns:
+            List[Dict]: List of dictionaries containing formatted transaction data
+        """
+        if self.df is None:
+            raise ValueError("No data to prepare. Call clean_data first.")
+
+        transactions = []
+        for _, row in self.df.iterrows():
+            # Handle transaction_date formatting
+            transaction_date = row['transaction_date']
+            if hasattr(transaction_date, 'strftime'):
+                transaction_date = transaction_date.strftime('%Y-%m-%d %H:%M:%S')
+            
+            # Handle amount formatting
+            amount = row['amount']
+            if not isinstance(amount, (int, float)):
+                amount = float(amount)
+            
+            transaction = {
+                'transaction_date': transaction_date,
+                'amount': amount,
+                'merchant_name': row['merchant_name'],
+                'category': row['category'],
+                'person': self.person,
+                'account_type': self.account_type
+            }
+            transactions.append(transaction)
+
+        return transactions
 
     def add_to_database(self, transactions: List[Dict]) -> bool:
         """

@@ -112,7 +112,7 @@ class ChaseTransactions(AddTransactions):
                 'amount': row['amount'],
                 'merchant_name': row['merchant_name'],
                 'category': row['category'],
-                'person': row['person'],
+                'person': self.person,
                 'account_type': self.account_type
             }
             transactions.append(transaction)

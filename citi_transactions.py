@@ -106,7 +106,7 @@ class CitiTransactions(AddTransactions):
                 'merchant_name': row['merchant_name'],
                 'category': row['category'],
                 'account_type': self.account_type,
-                'person': row['person']
+                'person': self.person
             }
             transactions.append(transaction)
 

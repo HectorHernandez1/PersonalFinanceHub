@@ -99,7 +99,7 @@ class AmexTransactions(AddTransactions):
                 'amount': row.get('amount'),
                 'merchant_name': row.get('merchant_name'),
                 'category': row.get('category'),
-                'person': row.get('person'),
+                'person': self.person,
                 'account_type': self.account_type
             }
             transactions.append(transaction)

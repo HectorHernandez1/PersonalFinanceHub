@@ -22,21 +22,21 @@ def main():
     and reviewing financial transactions from different sources.
     """
     processors = [
-        # {
-        #     "class": AppleTransactions,
-        #     "files_glob": "apple_files/*.csv",
-        #     "name": "Apple Card"
-        # },
-        # {
-        #      "class": ChaseTransactions,
-        #      "files_glob": "chase_files/*.pdf",
-        #      "name": "Chase Card"
-        #  },
-        # {
-        #     "class": AmexTransactions,
-        #     "files_glob": "Amex_files/*.csv",
-        #     "name": "Amex Card"
-        # },
+        {
+            "class": AppleTransactions,
+            "files_glob": "apple_files/*.csv",
+            "name": "Apple Card"
+        },
+        {
+             "class": ChaseTransactions,
+             "files_glob": "chase_files/*.pdf",
+             "name": "Chase Card"
+         },
+        {
+            "class": AmexTransactions,
+            "files_glob": "Amex_files/*.csv",
+            "name": "Amex Card"
+        },
         {
             "class": CitiTransactions,
             "files_glob": "Citi_files/*.CSV",

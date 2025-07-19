@@ -75,9 +75,6 @@ class CitiTransactions(AddTransactions):
         # Ensure amount is numeric and handle credits/debits
         self.df['amount'] = pd.to_numeric(self.df['amount'])
 
-        # Add person column
-        self.df['person'] = self.person
-
         #need to add a category column if it doesn't exist
         if 'category' not in self.df.columns:
             self.df['category'] = 'Other'
@@ -111,8 +108,7 @@ class CitiTransactions(AddTransactions):
             'transaction_date',
             'amount',
             'merchant_name',
-            'category',
-            'person'
+            'category'
         ]]
 
         return self.df

@@ -64,8 +64,6 @@ class AmexTransactions(AddTransactions):
             'Card Member,': 'person'
         })
 
-        # person column should already be set, but ensure it's consistent
-        self.df['person'] = self.person
 
         # Convert date string to datetime
         self.df['transaction_date'] = pd.to_datetime(self.df['transaction_date'])
@@ -106,8 +104,7 @@ class AmexTransactions(AddTransactions):
             'transaction_date',
             'amount',
             'merchant_name',
-            'category',
-            'person'
+            'category'
         ]]
 
         return self.df

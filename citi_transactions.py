@@ -1,6 +1,7 @@
 from add_transactions import AddTransactions
 import pandas as pd
 from typing import List, Dict
+from ai_helper import AIHelper
 
 class CitiTransactions(AddTransactions):
     def __init__(self, db_config: dict, person: str):
@@ -13,6 +14,7 @@ class CitiTransactions(AddTransactions):
         """
         super().__init__(db_config, person)
         self.account_type = 'Citi Card'
+        self.ai_helper = AIHelper()
 
     def read_files(self, file_paths: List[str]) -> pd.DataFrame:
         """

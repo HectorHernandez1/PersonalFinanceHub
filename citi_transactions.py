@@ -75,33 +75,8 @@ class CitiTransactions(AddTransactions):
         # Ensure amount is numeric and handle credits/debits
         self.df['amount'] = pd.to_numeric(self.df['amount'])
 
-        #need to add a category column if it doesn't exist
-        if 'category' not in self.df.columns:
-            self.df['category'] = 'Other'
-        
-        #check if mechant_name contains "return" or "refund"
-        self.df['category'] = self.df.apply(
-            lambda row: "Refunds & Returns" if 'return' in row['merchant_name'].lower() or 'refund' in row['merchant_name'].lower() else row['category'],
-            axis=1
-        )
-
-        #check merchant_name for payments
-        self.df['category'] = self.df.apply(
-            lambda row: "Payments" if 'payment' in row['merchant_name'].lower() else row['category'],
-            axis=1
-        )
-        
-        # Use AI to categorize transactions with 'Other' category
-        other_mask = self.df['category'] == 'Other'
-        if other_mask.any():
-            other_transactions = self.df[other_mask]
-            for idx, row in other_transactions.iterrows():
-                ai_category = self.ai_helper.guess_category_openai(
-                    row['merchant_name'], 
-                    list(self._category_cache.keys())
-                )
-                if ai_category != 'Other':
-                    self.df.loc[idx, 'category'] = ai_category
+        # Add categories using AI helper
+        self.df = self.ai_helper.add_category(self.df, self._category_cache)
 
         # Select and reorder columns
         self.df = self.df[[

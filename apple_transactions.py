@@ -81,23 +81,8 @@ class AppleTransactions(AddTransactions):
                 self.df['amount'] = self.df['amount'].str.replace('$', '').str.replace(',', '')
             self.df['amount'] = pd.to_numeric(self.df['amount'])
         
-        #check if mechant_name contains "return" or "refund"
-        self.df['category'] = self.df.apply(
-            lambda row: "Refunds & Returns" if 'return' in row['merchant_name'].lower() or 'refund' in row['merchant_name'].lower() else row['category'],
-            axis=1
-        )
-
-        # Use AI to categorize transactions with 'Other' category
-        other_mask = self.df['category'] == 'Other'
-        if other_mask.any():
-            other_transactions = self.df[other_mask]
-            for idx, row in other_transactions.iterrows():
-                ai_category = self.ai_helper.guess_category_openai(
-                    row['merchant_name'], 
-                    list(self._category_cache.keys())
-                )
-                if ai_category != 'Other':
-                    self.df.loc[idx, 'category'] = ai_category
+        # Add categories using AI helper
+        self.df = self.ai_helper.add_category(self.df, self._category_cache)
 
         # Use AI to categorize transactions with categories not in database
         invalid_category_mask = ~self.df['category'].isin(self._category_cache.keys())

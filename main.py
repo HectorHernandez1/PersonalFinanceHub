@@ -25,28 +25,38 @@ def main():
         {
             "class": AppleTransactions,
             "files_glob": "apple_files/*.csv",
-            "name": "Apple Card"
+            "name": "Apple Card",
+            "person": "Hector Hernandez"
         },
         {
              "class": ChaseTransactions,
              "files_glob": "chase_files/*.pdf",
-             "name": "Chase Card"
+             "name": "Chase Card",
+             "person": "Hector Hernandez"
+         },
+        {
+             "class": ChaseTransactions,
+             "files_glob": "chase_files_polette/*.pdf",
+             "name": "Chase Card",
+             "person": "Polette Rodriguez"
          },
         {
             "class": AmexTransactions,
             "files_glob": "Amex_files/*.csv",
-            "name": "Amex Card"
+            "name": "Amex Card",
+            "person": "Hector Hernandez"
         },
         {
             "class": CitiTransactions,
             "files_glob": "Citi_files/*.CSV",
-            "name": "Citi Card"
+            "name": "Citi Card",
+            "person": "Hector Hernandez"
         }
     ]
 
     for processor_info in processors:
         try:
-            processor = processor_info["class"](db_config=DB_CONFIG, person="Hector Hernandez")
+            processor = processor_info["class"](db_config=DB_CONFIG, person=processor_info["person"])
             files = glob.glob(processor_info["files_glob"])
             
             if files:

@@ -69,11 +69,17 @@ class CitiTransactions(AddTransactions):
             self.df.drop(columns=['Credit'], inplace=True)
 
 
-        # Convert date string to datetime - try both possible formats
-        try:
-            self.df['transaction_date'] = pd.to_datetime(self.df['transaction_date'], format='%b %d, %Y')
-        except ValueError:
-            self.df['transaction_date'] = pd.to_datetime(self.df['transaction_date'], format='%m/%d/%Y')
+        # Convert date string to datetime with flexible format handling
+        def parse_date(date_str):
+            formats = ['%m/%d/%Y', '%b %d, %Y', '%Y-%m-%d']
+            for fmt in formats:
+                try:
+                    return pd.to_datetime(date_str, format=fmt)
+                except ValueError:
+                    continue
+            return pd.to_datetime(date_str)  # fallback to pandas default parsing
+        
+        self.df['transaction_date'] = self.df['transaction_date'].apply(parse_date)
 
         # Ensure amount is numeric and handle credits/debits
         self.df['amount'] = pd.to_numeric(self.df['amount'])

@@ -80,6 +80,9 @@ class ChaseTransactions(AddTransactions):
         if self.df is None:
             raise ValueError("No data to clean. Call read_files first.")
         
+        # Convert date string to datetime (Chase PDF reader outputs YYYY-MM-DD format)
+        self.df['transaction_date'] = pd.to_datetime(self.df['transaction_date'], format='%Y-%m-%d')
+        
         # Ensure amount is numeric and handle credits/debits
         self.df['amount'] = pd.to_numeric(self.df['amount'])
 

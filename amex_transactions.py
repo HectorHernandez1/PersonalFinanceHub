@@ -65,8 +65,8 @@ class AmexTransactions(AddTransactions):
         })
 
 
-        # Convert date string to datetime
-        self.df['transaction_date'] = pd.to_datetime(self.df['transaction_date'])
+        # Convert date string to datetime with standard format
+        self.df['transaction_date'] = pd.to_datetime(self.df['transaction_date'], format='%m/%d/%Y')
 
         # Ensure amount is numeric and handle credits/debits
         self.df['amount'] = pd.to_numeric(self.df['amount'])

@@ -128,10 +128,19 @@ class AddTransactions(ABC):
 
         transactions = []
         for _, row in self.df.iterrows():
-            # Handle transaction_date formatting
+            # Handle transaction_date formatting - ensure consistent YYYY-MM-DD HH:MM:SS format
             transaction_date = row['transaction_date']
             if hasattr(transaction_date, 'strftime'):
+                # If it's already a datetime object, format it
                 transaction_date = transaction_date.strftime('%Y-%m-%d %H:%M:%S')
+            else:
+                # If it's a string, try to parse it first
+                try:
+                    parsed_date = pd.to_datetime(transaction_date)
+                    transaction_date = parsed_date.strftime('%Y-%m-%d %H:%M:%S')
+                except Exception:
+                    # If parsing fails, keep original value and let database handle it
+                    pass
             
             # Handle amount formatting
             amount = row['amount']

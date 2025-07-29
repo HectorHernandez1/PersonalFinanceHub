@@ -70,8 +70,8 @@ class AppleTransactions(AddTransactions):
             'Category': 'category'
         })
 
-        # Convert date string to datetime
-        self.df['transaction_date'] = pd.to_datetime(self.df['transaction_date'])
+        # Convert date string to datetime with standard format
+        self.df['transaction_date'] = pd.to_datetime(self.df['transaction_date'], format='%m/%d/%Y')
 
         # Ensure amount is numeric and handle credits/debits
         # First check if amount is already numeric

@@ -4,14 +4,18 @@ from amex_transactions import AmexTransactions
 from citi_transactions import CitiTransactions
 import glob
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Database configuration
 DB_CONFIG = {
-    "dbname": "money_stuff",
+    "dbname": os.environ.get("DB_NAME", "money_stuff"),
     "user": os.environ["DB_USER"],
     "password": os.environ["DB_PASSWORD"],
-    "host": "localhost",
-    "port": "5432",
+    "host": os.environ.get("DB_HOST", "localhost"),
+    "port": os.environ.get("DB_PORT", "5432"),
     "options": "-c search_path=budget_app"  
 }
 

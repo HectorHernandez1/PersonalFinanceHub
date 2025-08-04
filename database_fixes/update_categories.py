@@ -14,10 +14,11 @@ def get_db_config():
     """Load database configuration from environment variables."""
     load_dotenv()
     return {
-        'host': 'localhost',
-        'database': 'money_stuff',
+        'host': os.getenv('DB_HOST', 'localhost'),
+        'database': os.getenv('DB_NAME', 'money_stuff'),
         'user': os.getenv('DB_USER'),
-        'password': os.getenv('DB_PASSWORD')
+        'password': os.getenv('DB_PASSWORD'),
+        'port': os.getenv('DB_PORT', '5432')
     }
 
 def get_categories_from_db(conn):

@@ -15,11 +15,11 @@ load_dotenv()
 
 # Database configuration
 DB_CONFIG = {
-    "dbname": "money_stuff",
+    "dbname": os.getenv("DB_NAME", "money_stuff"),
     "user": os.getenv("DB_USER"),
     "password": os.getenv("DB_PASSWORD"),
-    "host": "localhost",
-    "port": "5432",
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": os.getenv("DB_PORT", "5432"),
     "options": "-c search_path=budget_app"
 }
 

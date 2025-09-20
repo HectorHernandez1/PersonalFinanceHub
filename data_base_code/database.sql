@@ -30,12 +30,14 @@ CREATE TABLE budget_app.transactions (
 
 CREATE VIEW budget_app.transactions_view AS
 SELECT 
+    t.id AS transaction_id,
     t.amount,
     t.merchant_name,
     s.category_name AS spending_category,
     p.name AS person,
     t.transaction_date,
-    a.card_type AS account_type
+    a.card_type AS account_type,
+    s.spending_limit
 FROM budget_app.transactions t
 JOIN budget_app.spending_categories s ON t.category_id = s.id
 JOIN budget_app.persons p ON t.person_id = p.id

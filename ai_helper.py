@@ -9,7 +9,8 @@ class AIHelper:
         self.openai_api_key = os.getenv('OPENAI_API_KEY')
         if self.openai_api_key:
             try:
-                self.llm = ChatOpenAI(model="gpt-4.1-nano", openai_api_key=self.openai_api_key, temperature=0)
+                # gpt-4.1-nano
+                self.llm = ChatOpenAI(model="gpt-5-nano", openai_api_key=self.openai_api_key, temperature=0)
             except ImportError:
                 self.llm = None
                 print("langchain_openai package not installed. OpenAI features will be unavailable.")

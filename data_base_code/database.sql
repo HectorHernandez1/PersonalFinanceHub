@@ -53,14 +53,10 @@ INSERT INTO budget_app.spending_categories (category_name) VALUES
     ('Subscriptions'),
     ('Travel'),
     ('Personal Care'),
-    ('Gifts & Donations'),
-    ('Insurance'),
     ('Home Maintenance'),
     ('Other'),
-    ('Installment'),
     ('Refunds & Returns'),
     ('Healthcare'),
-    ('AI Models'),
     ('Interest Charge'),
     ('Payments');
 

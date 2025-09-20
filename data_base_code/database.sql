@@ -8,7 +8,8 @@ CREATE TABLE budget_app.persons (
 
 CREATE TABLE budget_app.spending_categories (
     id SERIAL PRIMARY KEY,
-    category_name VARCHAR(100) UNIQUE NOT NULL
+    category_name VARCHAR(100) UNIQUE NOT NULL,
+    spending_limit DECIMAL(10,2) NOT NULL DEFAULT 0
 );
 
 CREATE TABLE budget_app.account_type (
@@ -42,24 +43,24 @@ JOIN budget_app.account_type a ON t.account_type_id = a.id;
 
 -------------
 
-INSERT INTO budget_app.spending_categories (category_name) VALUES
-    ('Groceries'),
-    ('Dining'),
-    ('Dog Care'),
-    ('Entertainment'),
-    ('Transportation'),
-    ('Utilities'),
-    ('Shopping'),
-    ('Education'),
-    ('Subscriptions'),
-    ('Travel'),
-    ('Personal Care'),
-    ('Home Maintenance'),
-    ('Other'),
-    ('Refunds & Returns'),
-    ('Healthcare'),
-    ('Interest Charge'),
-    ('Payments');
+INSERT INTO budget_app.spending_categories (category_name, spending_limit) VALUES
+    ('Groceries', 400.00),
+    ('Dining', 150.00),
+    ('Dog Care', 81.00),
+    ('Entertainment', 0.00),
+    ('Transportation', 423.00),
+    ('Utilities', 345.00),
+    ('Shopping', 0.00),
+    ('Education', 0.00),
+    ('Subscriptions', 188.83),
+    ('Travel', 0.00),
+    ('Personal Care', 50.00),
+    ('Home Maintenance', 0.00),
+    ('Other', 0.00),
+    ('Refunds & Returns', 0.00),
+    ('Healthcare', 0.00),
+    ('Interest Charge', 0.00),
+    ('Payments', 0.00);
 
 
 INSERT INTO budget_app.persons (name) VALUES
@@ -67,5 +68,4 @@ INSERT INTO budget_app.persons (name) VALUES
     ('Polette Rodriguez');
 
 COMMIT;
-
 

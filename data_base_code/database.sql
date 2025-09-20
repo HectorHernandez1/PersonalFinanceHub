@@ -45,6 +45,7 @@ JOIN budget_app.account_type a ON t.account_type_id = a.id;
 INSERT INTO budget_app.spending_categories (category_name) VALUES
     ('Groceries'),
     ('Dining'),
+    ('Dog Care'),
     ('Entertainment'),
     ('Transportation'),
     ('Utilities'),
@@ -66,6 +67,5 @@ INSERT INTO budget_app.persons (name) VALUES
     ('Polette Rodriguez');
 
 COMMIT;
-
 
 

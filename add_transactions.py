@@ -225,14 +225,14 @@ class AddTransactions(ABC):
         try:
             # Store all file paths initially
             self.processed_files = file_paths
-            
+
             # Read and clean data
             self.df = self.read_files(file_paths)
             self.df = self.clean_data()
-            
+
             # Prepare data for database insertion
             transactions = self.prepare_data_for_db()
-            
+
             # Add to database and get the count of successfully added transactions
             if transactions:
                 if self.add_to_database(transactions):
@@ -245,7 +245,8 @@ class AddTransactions(ABC):
                 print("No transactions to add after cleaning.")
 
         except Exception as e:
-            raise Exception(f"Transaction processing failed: {str(e)}")
+            print(f"Transaction processing failed: {str(e)}")
+            print("Files were NOT deleted due to error. Please review and retry.")
 
     def get_categories_from_db(self) -> List[str]:
         """

@@ -7,13 +7,21 @@ the appropriate category, and updates the database.
 
 import psycopg2
 import os
+import sys
 from dotenv import load_dotenv
+
+# Add parent directory to path to import modules
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from ai_helper import AIHelper
 from vendor_mapping import get_category_from_vendor
 
 def get_db_config():
     """Load database configuration from environment variables."""
-    load_dotenv()
+    # Load .env from parent directory
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    env_path = os.path.join(parent_dir, '.env')
+    load_dotenv(env_path)
     return {
         'host': os.getenv('DB_HOST', 'localhost'),
         'database': os.getenv('DB_NAME', 'money_stuff'),

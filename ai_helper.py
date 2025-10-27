@@ -4,6 +4,10 @@ import os
 import pandas as pd
 from typing import List
 from vendor_mapping import get_category_from_vendor
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 class AIHelper:
     def __init__(self):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Script to fix transactions with missing category IDs by using AI to categorize them.
-This script finds all transactions where category_id is null, uses AI to determine 
+This script finds all transactions where category_id is null, uses AI to determine
 the appropriate category, and updates the database.
 """
 
@@ -9,6 +9,7 @@ import psycopg2
 import os
 from dotenv import load_dotenv
 from ai_helper import AIHelper
+from vendor_mapping import get_category_from_vendor
 
 def get_db_config():
     """Load database configuration from environment variables."""
@@ -123,26 +124,41 @@ def main():
         
         # Process each transaction
         updated_count = 0
+        vendor_map_count = 0
+        ai_count = 0
         for transaction_id, merchant_name in transactions:
             print(f"Processing transaction {transaction_id}: {merchant_name}")
-            
-            # Use AI to guess category
-            ai_category = ai_helper.guess_category_openai(merchant_name, category_names)
-            
+
+            # First, try vendor mapping for known vendors
+            vendor_category = get_category_from_vendor(merchant_name)
+
+            if vendor_category:
+                category_name = vendor_category
+                source = "vendor mapping"
+                vendor_map_count += 1
+            else:
+                # Fall back to AI for unknown merchants
+                category_name = ai_helper.guess_category_openai(merchant_name, category_names)
+                source = "OpenAI"
+                if category_name != "Other":
+                    ai_count += 1
+
             # Get category ID
-            if ai_category in category_map:
-                category_id = category_map[ai_category]
-                
+            if category_name in category_map:
+                category_id = category_map[category_name]
+
                 # Update the transaction
                 update_transaction_category(conn, transaction_id, category_id)
                 updated_count += 1
-                print(f"  -> Updated to category: {ai_category} (ID: {category_id})")
+                print(f"  -> Updated to category: {category_name} (ID: {category_id}) [{source}]")
             else:
-                print(f"  -> Warning: AI returned unknown category '{ai_category}', skipping")
+                print(f"  -> Warning: Category '{category_name}' not found in database, skipping")
         
         # Commit all changes
         conn.commit()
         print(f"\nSuccessfully updated {updated_count} transactions with category IDs")
+        print(f"  - From vendor mapping: {vendor_map_count}")
+        print(f"  - From OpenAI: {ai_count}")
         
     except Exception as e:
         conn.rollback()

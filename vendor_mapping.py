@@ -60,6 +60,7 @@ VENDOR_CATEGORY_MAP = {
     "verizon": "Utilities",
     "at&t": "Utilities",
     "t-mobile": "Utilities",
+    "VISIBLE 866": "Utilities",
 
     # Transportation
     "uber": "Transportation",
@@ -69,6 +70,7 @@ VENDOR_CATEGORY_MAP = {
     "hotel": "Transportation",
     "parking": "Transportation",
     "transit": "Transportation",
+    "COSTCO GAS": "Transportation",
 
     # Shopping
     "amazon": "Shopping",
@@ -97,6 +99,9 @@ VENDOR_CATEGORY_MAP = {
     # Subscriptions
     "subscription": "Subscriptions",
     "subscription service": "Subscriptions",
+    "SPOTIFY": "Subscriptions",
+    "YouTubePremium": "Subscriptions",
+
 
     # Refunds
     "refund": "Refunds & Returns",

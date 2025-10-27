@@ -42,13 +42,13 @@ def get_categories_from_db(conn):
 def get_transactions_to_update(conn, target_category=None):
     """
     Get transactions that need category updates.
-    
+
     Args:
         target_category (str, optional): Specific category name to target for updates.
                                        If None, targets transactions with null category_id.
     """
     cursor = conn.cursor()
-    
+
     if target_category:
         # Get category ID for the target category
         cursor.execute("SELECT id FROM budget_app.spending_categories WHERE category_name = %s", (target_category,))
@@ -56,22 +56,24 @@ def get_transactions_to_update(conn, target_category=None):
         if not result:
             print(f"Error: Category '{target_category}' not found in database.")
             return []
-        
+
         target_category_id = result[0]
         cursor.execute("""
-            SELECT t.id, t.merchant_name 
-            FROM budget_app.transactions t 
+            SELECT t.id, t.merchant_name, s.category_name
+            FROM budget_app.transactions t
+            LEFT JOIN budget_app.spending_categories s ON t.category_id = s.id
             WHERE t.category_id = %s
         """, (target_category_id,))
         print(f"Finding transactions with category '{target_category}'...")
     else:
         cursor.execute("""
-            SELECT t.id, t.merchant_name 
-            FROM budget_app.transactions t 
+            SELECT t.id, t.merchant_name, s.category_name
+            FROM budget_app.transactions t
+            LEFT JOIN budget_app.spending_categories s ON t.category_id = s.id
             WHERE t.category_id IS NULL
         """)
         print("Finding transactions with null category_id...")
-    
+
     return cursor.fetchall()
 
 def update_transaction_category(conn, transaction_id, category_id):
@@ -134,8 +136,10 @@ def main():
         updated_count = 0
         vendor_map_count = 0
         ai_count = 0
-        for transaction_id, merchant_name in transactions:
+        for transaction_id, merchant_name, old_category in transactions:
             print(f"Processing transaction {transaction_id}: {merchant_name}")
+            old_category_str = old_category if old_category else "NULL"
+            print(f"  Current category: {old_category_str}")
 
             # First, try vendor mapping for known vendors
             vendor_category = get_category_from_vendor(merchant_name)
@@ -158,7 +162,7 @@ def main():
                 # Update the transaction
                 update_transaction_category(conn, transaction_id, category_id)
                 updated_count += 1
-                print(f"  -> Updated to category: {category_name} (ID: {category_id}) [{source}]")
+                print(f"  -> Updated from '{old_category_str}' to '{category_name}' (ID: {category_id}) [{source}]")
             else:
                 print(f"  -> Warning: Category '{category_name}' not found in database, skipping")
         

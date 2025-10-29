@@ -25,7 +25,7 @@ CREATE TABLE budget_app.transactions (
     person_id INT REFERENCES budget_app.persons(id) ON DELETE CASCADE,
     transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     account_type_id INT REFERENCES budget_app.account_type(id) ON DELETE SET NULL,
-    CONSTRAINT unique_transaction UNIQUE (amount, merchant_name, category_id, person_id, transaction_date)
+    CONSTRAINT unique_transaction UNIQUE (amount, merchant_name, person_id, transaction_date)
 );
 
 CREATE VIEW budget_app.transactions_view AS

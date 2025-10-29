@@ -53,12 +53,12 @@ def get_transactions_to_update(conn, target_categories=None):
 
 
     # Build IN clause with placeholders
+
     placeholders = "'"+"','".join(target_categories)+"'"
     query = """
         SELECT transaction_id, merchant_name, spending_category
         FROM budget_app.transactions_view tv
         WHERE tv.spending_category IN ({})
-        and tv.merchant_name like '%COSTCO GAS %'
     """.format(placeholders)
     print(query)
     cursor.execute(query)
@@ -81,13 +81,9 @@ def update_transaction_category(conn, transaction_id, category_id):
         WHERE id = %s
     """, (category_id, transaction_id))
 
-def main():
+def main(target_category):
     """Main function to fix missing category IDs."""
-    import sys
-    
-    # Check for command line argument
-    target_category = ['Groceries', 'Utilities']
-    
+
     # Initialize AI helper
     ai_helper = AIHelper()
     if not ai_helper.llm:
@@ -176,4 +172,5 @@ def main():
         print("Database connection closed.")
 
 if __name__ == "__main__":
-    main()
+    CategoryList = ["Entertainment"]
+    main(CategoryList)

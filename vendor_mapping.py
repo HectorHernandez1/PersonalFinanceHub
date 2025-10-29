@@ -22,7 +22,7 @@ VENDOR_CATEGORY_MAP = {
     "safeway": "Groceries",
     "kroger": "Groceries",
     "sprouts": "Groceries",
-    "costco": "Groceries",
+    "COSTCO WHSE": "Groceries",
     "costco.com": "Groceries",
     "grocery": "Groceries",
     "supermarket": "Groceries",
@@ -62,6 +62,8 @@ VENDOR_CATEGORY_MAP = {
     "at&t": "Utilities",
     "t-mobile": "Utilities",
     "VISIBLE 866": "Utilities",
+    "CITY OF CHANDLER": "Utilities",
+    "COX PHOENIX": "Utilities",
 
     # Transportation
     "uber": "Transportation",
@@ -102,6 +104,8 @@ VENDOR_CATEGORY_MAP = {
     "subscription service": "Subscriptions",
     "SPOTIFY": "Subscriptions",
     "YouTubePremium": "Subscriptions",
+    "Openai *chatgpt": "Subscriptions",
+    "Claude.Ai Subscription": "Subscriptions",
 
 
     # Refunds

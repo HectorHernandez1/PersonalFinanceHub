@@ -8,6 +8,7 @@ the appropriate category, and updates the database.
 import psycopg2
 import os
 import sys
+import traceback
 from dotenv import load_dotenv
 
 # Add parent directory to path to import modules
@@ -57,34 +58,23 @@ def get_transactions_to_update(conn, target_category=None):
         else:
             target_categories = target_category
 
-        # Get category IDs for the target categories
+        # Build IN clause with placeholders
         placeholders = ','.join(['%s'] * len(target_categories))
-        cursor.execute(f"SELECT id FROM budget_app.spending_categories WHERE category_name IN ({placeholders})", tuple(target_categories))
-        results = cursor.fetchall()
-
-        if not results:
-            print(f"Error: Categories {target_categories} not found in database.")
-            return []
-
-        target_category_ids = tuple([row[0] for row in results])
-        placeholders = ','.join(['%s'] * len(target_category_ids))
         cursor.execute(f"""
-            SELECT t.id, t.merchant_name, s.category_name
-            FROM budget_app.transactions t
-            LEFT JOIN budget_app.spending_categories s ON t.category_id = s.id
-            WHERE t.category_id IN ({placeholders})
-        """, target_category_ids)
-        print(f"Finding transactions with categories {target_categories}...")
-    else:
-        cursor.execute("""
-            SELECT t.id, t.merchant_name, s.category_name
-            FROM budget_app.transactions t
-            LEFT JOIN budget_app.spending_categories s ON t.category_id = s.id
-            WHERE t.category_id IS NULL
-        """)
-        print("Finding transactions with null category_id...")
+            SELECT transaction_id, merchant_name, spending_category
+            FROM budget_app.transactions_view tv
+            WHERE tv.spending_category IN ({placeholders})
+            and tv.merchant_name like '%COSTCO GAS %'
+        """, tuple(target_categories))
 
-    return cursor.fetchall()
+        print(f"Finding transactions with categories {target_categories}...")
+
+    results = cursor.fetchall()
+    if not results:
+        print(f"No transactions found matching criteria.")
+        return []
+
+    return results
 
 def update_transaction_category(conn, transaction_id, category_id):
     """Update a transaction's category_id."""
@@ -183,6 +173,8 @@ def main():
     except Exception as e:
         conn.rollback()
         print(f"Error occurred: {e}")
+        print("\nDetailed error trace:")
+        traceback.print_exc()
     finally:
         conn.close()
         print("Database connection closed.")

@@ -40,7 +40,7 @@ def get_categories_from_db(conn):
     category_map = {name: id for id, name in categories}
     return category_names, category_map
 
-def get_transactions_to_update(conn, target_category=None):
+def get_transactions_to_update(conn, target_categories=None):
     """
     Get transactions that need category updates.
 
@@ -51,23 +51,19 @@ def get_transactions_to_update(conn, target_category=None):
     """
     cursor = conn.cursor()
 
-    if target_category:
-        # Handle both single string and list of categories
-        if isinstance(target_category, str):
-            target_categories = [target_category]
-        else:
-            target_categories = target_category
 
-        # Build IN clause with placeholders
-        placeholders = ','.join(['%s'] * len(target_categories))
-        cursor.execute(f"""
-            SELECT transaction_id, merchant_name, spending_category
-            FROM budget_app.transactions_view tv
-            WHERE tv.spending_category IN ({placeholders})
-            and tv.merchant_name like '%COSTCO GAS %'
-        """, tuple(target_categories))
+    # Build IN clause with placeholders
+    placeholders = "'"+"','".join(target_categories)+"'"
+    query = """
+        SELECT transaction_id, merchant_name, spending_category
+        FROM budget_app.transactions_view tv
+        WHERE tv.spending_category IN ({})
+        and tv.merchant_name like '%COSTCO GAS %'
+    """.format(placeholders)
+    print(query)
+    cursor.execute(query)
 
-        print(f"Finding transactions with categories {target_categories}...")
+    print(f"Finding transactions with categories {target_categories}...")
 
     results = cursor.fetchall()
     if not results:

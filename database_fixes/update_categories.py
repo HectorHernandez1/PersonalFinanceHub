@@ -44,27 +44,37 @@ def get_transactions_to_update(conn, target_category=None):
     Get transactions that need category updates.
 
     Args:
-        target_category (str, optional): Specific category name to target for updates.
-                                       If None, targets transactions with null category_id.
+        target_category (str or list, optional): Specific category name(s) to target for updates.
+                                               If None, targets transactions with null category_id.
+                                               Can be a string for single category or list for multiple.
     """
     cursor = conn.cursor()
 
     if target_category:
-        # Get category ID for the target category
-        cursor.execute("SELECT id FROM budget_app.spending_categories WHERE category_name = %s", (target_category,))
-        result = cursor.fetchone()
-        if not result:
-            print(f"Error: Category '{target_category}' not found in database.")
+        # Handle both single string and list of categories
+        if isinstance(target_category, str):
+            target_categories = [target_category]
+        else:
+            target_categories = target_category
+
+        # Get category IDs for the target categories
+        placeholders = ','.join(['%s'] * len(target_categories))
+        cursor.execute(f"SELECT id FROM budget_app.spending_categories WHERE category_name IN ({placeholders})", tuple(target_categories))
+        results = cursor.fetchall()
+
+        if not results:
+            print(f"Error: Categories {target_categories} not found in database.")
             return []
 
-        target_category_id = result[0]
-        cursor.execute("""
+        target_category_ids = tuple([row[0] for row in results])
+        placeholders = ','.join(['%s'] * len(target_category_ids))
+        cursor.execute(f"""
             SELECT t.id, t.merchant_name, s.category_name
             FROM budget_app.transactions t
             LEFT JOIN budget_app.spending_categories s ON t.category_id = s.id
-            WHERE t.category_id = %s
-        """, (target_category_id,))
-        print(f"Finding transactions with category '{target_category}'...")
+            WHERE t.category_id IN ({placeholders})
+        """, target_category_ids)
+        print(f"Finding transactions with categories {target_categories}...")
     else:
         cursor.execute("""
             SELECT t.id, t.merchant_name, s.category_name
@@ -90,12 +100,7 @@ def main():
     import sys
     
     # Check for command line argument
-    target_category = None
-    if len(sys.argv) > 1:
-        target_category = sys.argv[1]
-        print(f"Starting to update transactions with category '{target_category}'...")
-    else:
-        print("Starting to fix missing category IDs...")
+    target_category = ['Groceries', 'Utilities']
     
     # Initialize AI helper
     ai_helper = AIHelper()
@@ -159,10 +164,13 @@ def main():
             if category_name in category_map:
                 category_id = category_map[category_name]
 
-                # Update the transaction
-                update_transaction_category(conn, transaction_id, category_id)
-                updated_count += 1
-                print(f"  -> Updated from '{old_category_str}' to '{category_name}' (ID: {category_id}) [{source}]")
+                # Only update if the category is different from the old one
+                if category_name != old_category:
+                    update_transaction_category(conn, transaction_id, category_id)
+                    updated_count += 1
+                    print(f"  -> Updated from '{old_category_str}' to '{category_name}' (ID: {category_id}) [{source}]")
+                else:
+                    print(f"  -> Category already set to '{category_name}', no update needed")
             else:
                 print(f"  -> Warning: Category '{category_name}' not found in database, skipping")
         

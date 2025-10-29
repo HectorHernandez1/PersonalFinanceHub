@@ -65,7 +65,7 @@ class AIHelper:
 
         # First, check vendor mapping for known vendors
         df['category'] = df.apply(
-            lambda row: get_category_from_vendor(row['merchant_name']) or row['category'],
+            lambda row: get_category_from_vendor(row['merchant_name']),
             axis=1
         )
 

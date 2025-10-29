@@ -26,6 +26,7 @@ VENDOR_CATEGORY_MAP = {
     "costco.com": "Groceries",
     "grocery": "Groceries",
     "supermarket": "Groceries",
+    "Los Altos Ranch Market": "Groceries",
 
     # Dining
     "restaurant": "Dining",
@@ -120,8 +121,6 @@ def get_category_from_vendor(merchant_name: str) -> str:
     Returns:
         str: The category name if found, None otherwise
     """
-    if not merchant_name:
-        return None
 
     merchant_lower = merchant_name.lower()
 
@@ -131,7 +130,7 @@ def get_category_from_vendor(merchant_name: str) -> str:
 
     # Check for partial matches (substring matching)
     for vendor_pattern, category in VENDOR_CATEGORY_MAP.items():
-        if vendor_pattern in merchant_lower:
+        if vendor_pattern.lower() in merchant_lower:
             return category
 
     return None

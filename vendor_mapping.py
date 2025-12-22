@@ -41,10 +41,6 @@ VENDOR_CATEGORY_MAP = {
     "pub": "Dining",
 
     # Entertainment
-    "netflix": "Entertainment",
-    "spotify": "Entertainment",
-    "hulu": "Entertainment",
-    "disney": "Entertainment",
     "movie": "Entertainment",
     "cinema": "Entertainment",
     "theater": "Entertainment",
@@ -102,10 +98,13 @@ VENDOR_CATEGORY_MAP = {
     # Subscriptions
     "subscription": "Subscriptions",
     "subscription service": "Subscriptions",
-    "SPOTIFY": "Subscriptions",
+    "spotify": "Subscriptions",
     "YouTubePremium": "Subscriptions",
     "Openai *chatgpt": "Subscriptions",
     "Claude.Ai Subscription": "Subscriptions",
+    "netflix": "Subscriptions",
+    "hulu": "Subscriptions",
+    "disney": "Subscriptions",
 
 
     # Refunds

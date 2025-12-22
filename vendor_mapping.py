@@ -9,6 +9,12 @@ This allows for quick categorization without needing to call the OpenAI API.
 # Keys are lowercase patterns to match against merchant names
 # Values must match EXACTLY with category_name in database.sql
 VENDOR_CATEGORY_MAP = {
+    # Hobby
+    "global bike": "Hobby",
+    "MBO": "Hobby",
+    "rapha": "Hobby",
+    "specialized": "Hobby",
+
     # Payments
     "payment": "Payments",
     "paypal": "Payments",

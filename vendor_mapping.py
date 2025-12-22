@@ -14,6 +14,9 @@ VENDOR_CATEGORY_MAP = {
     "MBO": "Hobby",
     "rapha": "Hobby",
     "specialized": "Hobby",
+    "bike master": "Hobby",
+    "Phoenix Metro Bicycle": "Hobby",
+    "SKRATCH LABS": "Hobby",
 
     # Payments
     "payment": "Payments",

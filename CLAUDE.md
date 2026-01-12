@@ -87,5 +87,5 @@ The PostgreSQL database (`money_stuff`) uses the `budget_app` schema with these 
 ## Security Considerations
 
 - Never commit the `.env` file containing API keys and database credentials
-- The codebase contains an exposed OpenAI API key in `next_steps_notes.txt` that should be secured
 - Database connections use environment variables for credentials
+- All transaction files (CSV, PDF) should be kept in their respective folders which are gitignored

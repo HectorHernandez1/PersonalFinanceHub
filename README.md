@@ -5,7 +5,7 @@ This project is a personal finance tool for reviewing, cleaning, and loading cre
 ## Features
 
 - **Multi-source transaction processing**: Apple Card (CSV), Chase (PDF), Amex (CSV), and Citi (CSV)
-- **AI-powered categorization**: Uses OpenAI GPT-4.1-nano to automatically categorize transactions
+- **AI-powered categorization**: Uses OpenAI GPT-5-nano to automatically categorize transactions
 - **Data normalization**: Cleans and standardizes transaction data for each card type
 - **Duplicate prevention**: Prevents duplicate transactions via database constraints
 - **Automated file management**: Deletes processed files after successful database insertion
@@ -53,7 +53,7 @@ python main.py
    - `ChaseTransactions`: Processes Chase PDF statements using AI categorization
    - `AmexTransactions`: Processes Amex CSV files with AI category guessing
    - `CitiTransactions`: Processes Citi CSV files
-3. **AIHelper (ai_helper.py)**: Uses OpenAI's GPT-4.1-nano model for transaction categorization
+3. **AIHelper (ai_helper.py)**: Uses OpenAI's GPT-5-nano model for transaction categorization
 4. **PDF Processing**: Chase transactions are processed from PDF files using specialized readers
 
 ### Database Schema

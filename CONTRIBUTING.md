@@ -1,6 +1,6 @@
-# Contributing to Money Review
+# Contributing to PersonalFinanceHub
 
-Thank you for your interest in contributing to Money Review! This document provides guidelines for contributing to the project.
+Thank you for your interest in contributing to PersonalFinanceHub! This document provides guidelines for contributing to the project.
 
 ## How to Contribute
 
@@ -32,8 +32,8 @@ For feature requests or enhancements:
 1. **Fork the repository**
 2. **Clone your fork**:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/MoneyChecking.git
-   cd MoneyChecking
+   git clone https://github.com/YOUR_USERNAME/PersonalFinanceHub.git
+   cd PersonalFinanceHub
    ```
 3. **Create a branch**:
    ```bash
@@ -188,8 +188,8 @@ If you have questions about contributing:
 
 ## Recognition
 
-Contributors will be recognized in the project README. Thank you for helping improve Money Review!
+Contributors will be recognized in the project README. Thank you for helping improve PersonalFinanceHub!
 
 ## License
 
-By contributing to Money Review, you agree that your contributions will be licensed under the MIT License.
+By contributing to PersonalFinanceHub, you agree that your contributions will be licensed under the MIT License.

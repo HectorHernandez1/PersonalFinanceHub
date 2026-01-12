@@ -1,4 +1,4 @@
-# Money Review - Personal Finance Transaction Processor
+# PersonalFinanceHub - AI-Powered Transaction Manager
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
@@ -122,7 +122,7 @@ The script will:
 ## File Structure
 
 ```
-Money_review/
+PersonalFinanceHub/
 ├── main.py                     # Main processor
 ├── add_transactions.py         # Base transaction class
 ├── apple_transactions.py       # Apple Card processor

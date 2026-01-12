@@ -14,11 +14,45 @@ class ChaseStatementReader(PDFStatementReader):
             text = first_page.extract_text().lower()
             return 'chase' in text
             
+    def extract_statement_year(self, pdf) -> int:
+        """Extract the statement year from the PDF"""
+        try:
+            first_page = pdf.pages[0]
+            text = first_page.extract_text()
+
+            # Look for statement period patterns like "Opening/Closing Date 11/16/25 - 12/15/25"
+            # or "Statement Period: 11/16/2025 - 12/15/2025"
+            closing_date_pattern = r'(\d{1,2}/\d{1,2}/(\d{2}|\d{4}))\s*-\s*(\d{1,2}/\d{1,2}/(\d{2}|\d{4}))'
+            match = re.search(closing_date_pattern, text)
+
+            if match:
+                # Get the closing date (second date in range)
+                closing_date = match.group(3)
+                year_str = match.group(4)
+
+                # Handle 2-digit or 4-digit year
+                if len(year_str) == 2:
+                    year = 2000 + int(year_str)
+                else:
+                    year = int(year_str)
+
+                return year
+
+        except Exception as e:
+            print(f"Could not extract statement year: {e}")
+
+        # Fallback to current year if we can't find it
+        return datetime.now().year
+
     def extract_transactions(self) -> pd.DataFrame:
         """Extract transactions from Chase PDF statement"""
         transactions = []
-        
+
         with pdfplumber.open(self.pdf_path) as pdf:
+            # Extract the statement year first
+            statement_year = self.extract_statement_year(pdf)
+            print(f"Using statement year: {statement_year}")
+
             for page in pdf.pages:
                 text = page.extract_text()
                 
@@ -44,9 +78,9 @@ class ChaseStatementReader(PDFStatementReader):
                                 
                                 # Validate amount format
                                 if re.match(r'^-?\d+\.\d{2}$', amount):
-                                    # Add current year to the date
-                                    date = f"{date}/{datetime.now().year}"
-                                    
+                                    # Add statement year to the date
+                                    date = f"{date}/{statement_year}"
+
                                     transactions.append({
                                         'date': self._standardize_date(date),
                                         'description': description,

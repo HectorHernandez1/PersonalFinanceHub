@@ -1,5 +1,10 @@
 # Money Review - Personal Finance Transaction Processor
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-blue.svg)](https://www.postgresql.org/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-GPT--5--nano-green.svg)](https://openai.com/)
+
 This project is a personal finance tool for reviewing, cleaning, and loading credit card transactions from multiple sources (Apple Card, Chase, Amex, Citi) into a PostgreSQL database. It helps you organize, categorize, and analyze your spending data with AI-powered categorization.
 
 ## Features
@@ -181,13 +186,15 @@ print(f"DEBUG - AI Response: {category}")
 
 ## Contributing
 
-This is a personal finance tool, but contributions are welcome:
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly with sample data
-5. Submit a pull request
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on:
+- Reporting issues
+- Suggesting enhancements
+- Submitting pull requests
+- Code style and standards
+- Adding new card types
 
 ## License
 
-This project is for personal use. Please ensure compliance with your financial institutions' terms of service when processing transaction data.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+**Disclaimer**: Please ensure compliance with your financial institutions' terms of service when processing transaction data. This software is provided as-is without warranty.

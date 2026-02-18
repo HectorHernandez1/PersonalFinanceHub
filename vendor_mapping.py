@@ -122,6 +122,9 @@ VENDOR_CATEGORY_MAP = {
     "credit": "Refunds & Returns",
 }
 
+# Normalize keys and values to lowercase for consistent matching
+VENDOR_CATEGORY_MAP = {k.lower(): v.lower() for k, v in VENDOR_CATEGORY_MAP.items()}
+
 
 def get_category_from_vendor(merchant_name: str) -> str:
     """
@@ -138,12 +141,12 @@ def get_category_from_vendor(merchant_name: str) -> str:
 
     # Check for exact matches first
     if merchant_lower in VENDOR_CATEGORY_MAP:
-        return VENDOR_CATEGORY_MAP[merchant_lower]
+        return VENDOR_CATEGORY_MAP[merchant_lower].lower()
 
     # Check for partial matches (substring matching)
     for vendor_pattern, category in VENDOR_CATEGORY_MAP.items():
         if vendor_pattern.lower() in merchant_lower:
-            return category
+            return category.lower()
 
     return None
 

@@ -17,6 +17,10 @@ VENDOR_CATEGORY_MAP = {
     "bike master": "Hobby",
     "Phoenix Metro Bicycle": "Hobby",
     "SKRATCH LABS": "Hobby",
+    "Anthropic":"Hobby",
+    "Openrouter, Inc":"Hobby",
+    "Openai":"Hobby",
+
 
     # Payments
     "payment": "Payments",

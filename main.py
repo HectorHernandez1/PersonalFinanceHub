@@ -4,6 +4,8 @@ from amex_transactions import AmexTransactions
 from citi_transactions import CitiTransactions
 import glob
 import os
+import sys
+import psycopg2
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -19,12 +21,23 @@ DB_CONFIG = {
     "options": "-c search_path=budget_app"  
 }
 
+def check_db_connection(db_config):
+    try:
+        conn = psycopg2.connect(**db_config, connect_timeout=5)
+        conn.close()
+        print("Database connection successful")
+    except psycopg2.OperationalError as e:
+        print(f"Cannot connect to database: {e}")
+        sys.exit(1)
+
 def main():
     """
     Main entry point for the Money Review application.
     This function handles the orchestration of loading, processing,
     and reviewing financial transactions from different sources.
     """
+    check_db_connection(DB_CONFIG)
+
     processors = [
         {
             "class": AppleTransactions,

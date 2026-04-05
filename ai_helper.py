@@ -9,7 +9,19 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class AIHelper:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
+
     def __init__(self):
+        if self._initialized:
+            return
+        self._initialized = True
+
         # AI_PROVIDER selects the backend: "ollama" (local) or "openai" (cloud)
         self.provider = os.getenv('AI_PROVIDER', 'ollama').lower()
         self.llm = None

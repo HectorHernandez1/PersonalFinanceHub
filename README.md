@@ -4,13 +4,14 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-blue.svg)](https://www.postgresql.org/)
 [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--5--nano-green.svg)](https://openai.com/)
+[![Ollama](https://img.shields.io/badge/Ollama-Local%20LLM-lightgrey.svg)](https://ollama.com/)
 
 This project is a personal finance tool for reviewing, cleaning, and loading credit card transactions from multiple sources (Apple Card, Chase, Amex, Citi) into a PostgreSQL database. It helps you organize, categorize, and analyze your spending data with AI-powered categorization.
 
 ## Features
 
 - **Multi-source transaction processing**: Apple Card (CSV), Chase (PDF), Amex (CSV), and Citi (CSV)
-- **AI-powered categorization**: Uses OpenAI GPT-5-nano to automatically categorize transactions
+- **AI-powered categorization**: Pluggable LLM backend — use OpenAI GPT-5-nano in the cloud or run a local model through Ollama (e.g. `gemma4:e4b`) for offline, zero-cost inference
 - **Data normalization**: Cleans and standardizes transaction data for each card type
 - **Duplicate prevention**: Prevents duplicate transactions via database constraints
 - **Automated file management**: Deletes processed files after successful database insertion
@@ -21,12 +22,33 @@ This project is a personal finance tool for reviewing, cleaning, and loading cre
 
 ### 1. Environment Setup
 
-Create a `.env` file with your credentials:
+Copy the template and fill in your values:
+```bash
+cp .env.example .env
+```
+
+`.env` contains database credentials and the AI backend selection. The `AI_PROVIDER` variable controls which LLM is used:
+
+**Option A — Local LLM via Ollama** (no API costs, runs offline):
 ```env
-DB_USER=your_db_user
-DB_PASSWORD=your_db_password
+AI_PROVIDER=ollama
+OLLAMA_MODEL=gemma4:e4b
+OLLAMA_BASE_URL=http://localhost:11434
+```
+Requires [Ollama](https://ollama.com/) installed and the model pulled:
+```bash
+ollama pull gemma4:e4b
+```
+Any Ollama-compatible model works — swap `OLLAMA_MODEL` to `gemma4:26b`, `qwen3:14b`, etc. Point `OLLAMA_BASE_URL` at another machine on your LAN to offload inference.
+
+**Option B — OpenAI** (cloud):
+```env
+AI_PROVIDER=openai
+OPENAI_MODEL=gpt-5-nano
 OPENAI_API_KEY=your_openai_api_key
 ```
+
+Because `.env` is gitignored, each machine can pick its own backend independently — e.g. Ollama on a Linux box with a GPU, OpenAI on a laptop.
 
 ### 2. Database Setup
 
@@ -58,7 +80,7 @@ python main.py
    - `ChaseTransactions`: Processes Chase PDF statements using AI categorization
    - `AmexTransactions`: Processes Amex CSV files with AI category guessing
    - `CitiTransactions`: Processes Citi CSV files
-3. **AIHelper (ai_helper.py)**: Uses OpenAI's GPT-5-nano model for transaction categorization
+3. **AIHelper (ai_helper.py)**: Two-stage categorization — first checks `vendor_mapping.py` for known merchants (no LLM call), then falls back to an LLM for unknowns. The LLM backend is chosen at runtime from the `AI_PROVIDER` env var: `ollama` (local, via `langchain-ollama`) or `openai` (cloud, via `langchain-openai`). Imports are lazy so only the selected backend's package is required.
 4. **PDF Processing**: Chase transactions are processed from PDF files using specialized readers
 
 ### Database Schema
@@ -116,7 +138,9 @@ The script will:
 
 - **Python**: 3.11+
 - **Database**: PostgreSQL
-- **API**: OpenAI API key for AI categorization
+- **AI backend** (pick one):
+  - [Ollama](https://ollama.com/) running locally (or reachable over your LAN) with a chat model pulled, *or*
+  - OpenAI API key
 - **Dependencies**: See `requirements.txt`
 
 ## File Structure
@@ -173,8 +197,9 @@ The `AIHelper` class can be extended to:
 
 1. **Database connection errors**: Check your `.env` file and database credentials
 2. **OpenAI API errors**: Verify your API key and account has sufficient credits
-3. **PDF processing errors**: Ensure Chase PDF files are not password-protected
-4. **Category errors**: Use the fix script to update missing or incorrect categories
+3. **Ollama connection errors**: Confirm `ollama serve` is running and `OLLAMA_BASE_URL` is reachable (`curl $OLLAMA_BASE_URL/api/tags`). Make sure the model in `OLLAMA_MODEL` has been pulled (`ollama list`).
+4. **PDF processing errors**: Ensure Chase PDF files are not password-protected
+5. **Category errors**: Use the fix script to update missing or incorrect categories
 
 ### Debugging
 

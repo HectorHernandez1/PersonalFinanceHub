@@ -20,6 +20,25 @@ Execute the database schema and initial data:
 psql -d money_stuff -f data_base_code/database.sql
 ```
 
+### Maintenance Scripts (`database_fixes/`)
+Utility scripts for data integrity, run from inside `database_fixes/`:
+```bash
+# Re-categorize transactions with null category_id (vendor mapping → OpenAI fallback)
+python update_categories.py
+
+# Re-categorize all transactions currently in a given category
+python update_categories.py "Other"
+
+# Fix transactions whose dates were parsed into the wrong year
+python fix_future_dates.py
+```
+Both scripts preview changes and require confirmation before writing.
+
+### Requirements
+- Python 3.11+
+- PostgreSQL
+- OpenAI API key
+
 ### Environment Setup
 Create a `.env` file with:
 ```
@@ -78,7 +97,6 @@ The PostgreSQL database (`money_stuff`) uses the `budget_app` schema with these 
 - The system uses duplicate prevention via the `unique_transaction` constraint
 - **Vendor Mapping**: Known merchants are categorized instantly from `vendor_mapping.py` without API calls
 - **OpenAI API**: Only used for unknown merchants that don't match any vendor pattern (reduces API costs)
-- Vendor mapping includes common merchants: Amazon, Netflix, Uber, Whole Foods, Petco, etc.
 - All category names in vendor mapping must match exactly with `spending_categories` table in database
 - Chase transactions require PDF processing, not CSV
 - All processors use the same database connection pattern with caching for reference data

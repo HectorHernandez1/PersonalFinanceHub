@@ -1,4 +1,3 @@
-from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
 import os
 import pandas as pd
@@ -11,17 +10,44 @@ load_dotenv()
 
 class AIHelper:
     def __init__(self):
-        self.openai_api_key = os.getenv('OPENAI_API_KEY')
-        if self.openai_api_key:
-            try:
-                # gpt-5-nano does not support custom temperature, uses default (1)
-                self.llm = ChatOpenAI(model="gpt-5-nano", openai_api_key=self.openai_api_key)
-            except ImportError:
-                self.llm = None
-                print("langchain_openai package not installed. OpenAI features will be unavailable.")
+        # AI_PROVIDER selects the backend: "ollama" (local) or "openai" (cloud)
+        self.provider = os.getenv('AI_PROVIDER', 'ollama').lower()
+        self.llm = None
+
+        if self.provider == 'openai':
+            self._init_openai()
+        elif self.provider == 'ollama':
+            self._init_ollama()
         else:
-            self.llm = None
-            print("OPENAI_API_KEY environment variable not set. OpenAI features will be unavailable.")
+            print(f"Unknown AI_PROVIDER '{self.provider}'. Expected 'openai' or 'ollama'. AI features disabled.")
+
+    def _init_openai(self):
+        api_key = os.getenv('OPENAI_API_KEY')
+        if not api_key:
+            print("OPENAI_API_KEY not set. AI features disabled.")
+            return
+        try:
+            from langchain_openai import ChatOpenAI
+            model = os.getenv('OPENAI_MODEL', 'gpt-5-nano')
+            # gpt-5-nano does not support custom temperature, uses default (1)
+            self.llm = ChatOpenAI(model=model, openai_api_key=api_key)
+            print(f"AIHelper using OpenAI model '{model}'")
+        except ImportError:
+            print("langchain_openai package not installed. AI features disabled.")
+        except Exception as e:
+            print(f"Failed to initialize OpenAI: {e}")
+
+    def _init_ollama(self):
+        model = os.getenv('OLLAMA_MODEL', 'gemma4:e4b')
+        base_url = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
+        try:
+            from langchain_ollama import ChatOllama
+            self.llm = ChatOllama(model=model, base_url=base_url, temperature=0)
+            print(f"AIHelper using Ollama model '{model}' at {base_url}")
+        except ImportError:
+            print("langchain_ollama package not installed. AI features disabled.")
+        except Exception as e:
+            print(f"Failed to initialize Ollama ({model} @ {base_url}): {e}")
 
     def guess_category_openai(self, merchant_name: str, categories: List[str]) -> str:
         if not self.llm or not categories:
@@ -45,7 +71,7 @@ class AIHelper:
                 return "Other"
             return category
         except Exception as e:
-            print(f"AI category guess (OpenAI) failed for merchant '{merchant_name}': {e}")
+            print(f"AI category guess ({self.provider}) failed for merchant '{merchant_name}': {e}")
             return "Other"
 
     def add_category(self, df: pd.DataFrame, category_cache: dict) -> pd.DataFrame:

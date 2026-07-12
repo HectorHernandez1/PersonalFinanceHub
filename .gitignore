@@ -1,5 +1,6 @@
-# Ignore all CSV files
+# Ignore all CSV files and PDF statements
 *.csv
+*.pdf
 
 # Ignore specific CSV files in directories
 apple_files/*.csv

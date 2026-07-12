@@ -24,6 +24,8 @@ VENDOR_CATEGORY_MAP = {
 
     # Payments
     "payment": "Payments",
+    "autopay": "Payments",
+    "auto-pmt": "Payments",
     "paypal": "Payments",
     "venmo": "Payments",
     "stripe": "Payments",

@@ -1,5 +1,6 @@
-# Ignore all CSV files and PDF statements
+# Ignore all CSV files and PDF statements (Citi exports uppercase .CSV)
 *.csv
+*.CSV
 *.pdf
 
 # Ignore specific CSV files in directories

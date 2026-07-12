@@ -142,17 +142,21 @@ def main(target_category):
                 if category_name != "Other":
                     ai_count += 1
 
-            # Get category ID
-            if category_name in category_map:
-                category_id = category_map[category_name]
+            # Get category ID (case-insensitive lookup -> canonical name)
+            canonical_name = next(
+                (name for name in category_map if name.lower() == category_name.lower()),
+                None,
+            )
+            if canonical_name:
+                category_id = category_map[canonical_name]
 
                 # Only update if the category is different from the old one
-                if category_name != old_category:
+                if canonical_name != old_category:
                     update_transaction_category(conn, transaction_id, category_id)
                     updated_count += 1
-                    print(f"  -> Updated from '{old_category_str}' to '{category_name}' (ID: {category_id}) [{source}]")
+                    print(f"  -> Updated from '{old_category_str}' to '{canonical_name}' (ID: {category_id}) [{source}]")
                 else:
-                    print(f"  -> Category already set to '{category_name}', no update needed")
+                    print(f"  -> Category already set to '{canonical_name}', no update needed")
             else:
                 print(f"  -> Warning: Category '{category_name}' not found in database, skipping")
         

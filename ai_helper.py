@@ -79,9 +79,12 @@ class AIHelper:
             response = self.llm.invoke(messages)
             category = response.content.strip()
             #print(f"DEBUG - AI Response: {category}")
-            if category not in categories:
-                return "Other"
-            return category
+            # Match case-insensitively and return the canonical category name,
+            # so a reply like "utilities" still maps to "Utilities".
+            for valid in categories:
+                if category.lower() == valid.lower():
+                    return valid
+            return "Other"
         except Exception as e:
             print(f"AI category guess ({self.provider}) failed for merchant '{merchant_name}': {e}")
             return "Other"

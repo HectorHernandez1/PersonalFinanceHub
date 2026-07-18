@@ -31,3 +31,5 @@ __pycache__/
 
 # dont add my notes
 next_steps_notes.txt
+# Claude Code local settings
+.claude/
